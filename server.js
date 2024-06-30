@@ -26,6 +26,7 @@ const taskSchema=new mongoose.Schema({
    taskDescription:String
 })
 const userdata=mongoose.model('userdata',userdataSchema);
+const task=mongoose.model('task',taskSchema);
 
 
 app.get('/', (req, res) => {
@@ -35,6 +36,36 @@ app.get('/', (req, res) => {
    });
 });
 
+app.post('/addtask',async (req,res)=>{
+   const {id,taskName,taskDescription}=req.body;
+   const newTask=await new task({
+      userid:id,
+      taskName:taskName,
+      taskDescription:taskDescription
+   });
+   await newTask.save().then(()=>{
+      console.log('saved the new task');
+      res.status(200).json({message:'done'})
+   }).catch((e)=>{
+      console.log(e);
+      res.status(500).json({message:'internal server error'})
+   })
+})
+
+
+app.get('/getTask', async (req, res) => {
+   try {
+      const id = req.query.id;
+      if (!id) {
+         return res.status(400).send('Missing id parameter');
+      }
+      const tasks = await task.find({userid: id});
+      res.send(tasks);
+   } catch (error) {
+      console.error('Error fetching tasks:', error);
+      res.status(500).send('An error occurred while fetching tasks');
+   }
+});
 
 
 app.post('/signup',async (req,res)=>{
