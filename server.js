@@ -68,6 +68,21 @@ app.get('/getTask', async (req, res) => {
 });
 
 
+app.delete('/deleteTask', async (req, res) => {
+   try {
+      const id = req.body.id;
+      const deleteResult = await task.deleteOne({ _id: id });
+
+      if (deleteResult.deletedCount > 0) {
+         return res.status(200).json({ message: 'Task deleted successfully' });
+      } else {
+         return res.status(404).json({ message: 'Task not found' });
+      }
+   } catch (error) {
+      console.error('Error deleting task:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+   }
+});
 app.post('/signup',async (req,res)=>{
    const {username,password,name}=req.body;
    if(!username || !password){
